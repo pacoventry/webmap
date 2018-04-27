@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Show bldg sqft on hover</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet">
+    
+  <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.min.js'></script>
+<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v2.2.0/mapbox-gl-geocoder.css' type='text/css' />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      h2,
+      h3 {
+        margin: 10px;
+        font-size: 1.2em;
+      }
+
+      h3 {
+        font-size: 1em;
+      }
+
+      p {
+        font-size: 0.85em;
+        margin: 10px;
+        text-align: left;
+      }
+
+      .map-overlay {
+        position: absolute;
+        bottom: 0;
+        right: 100;
+        background: rgba(255, 255, 255, 0.8);
+        margin-right: 20px;
+        font-family: Arial, sans-serif;
+        overflow: auto;
+        border-radius: 3px;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+
+      #features {
+        top: 0;
+        height: 100px;
+        margin-top: 20px;
+        width: 250px;
+      }
+
+  </style>
+  </head>
+
+  <body>
+
+    <div id="map" class="mapboxgl-map">
+      <div class="mapboxgl-missing-css">Missing Mapbox GL JS CSS</div>
+      <div class="mapboxgl-canvas-container mapboxgl-interactive mapboxgl-touch-drag-pan mapboxgl-touch-zoom-rotate"><canvas class="mapboxgl-canvas" tabindex="0" aria-label="Map" width="150" height="831" style="position: absolute; width: 150px; height: 831px; cursor: default;"></canvas></div>
+      <div class="mapboxgl-control-container">
+        <div class="mapboxgl-ctrl-top-left"></div>
+        <div class="mapboxgl-ctrl-top-right"></div>
+        <div class="mapboxgl-ctrl-bottom-left">
+          <div class="mapboxgl-ctrl" style="display: block;"><a class="mapboxgl-ctrl-logo" target="_blank" href="https://www.mapbox.com/" aria-label="Mapbox logo"></a></div>
+        </div>
+        <div class="mapboxgl-ctrl-bottom-right">
+            <div class="mapboxgl-ctrl mapboxgl-ctrl-attrib mapboxgl-compact">
+                <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> 
+                <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a> <a class="mapbox-improve-map" href="https://www.mapbox.com/feedback/?owner=examples&amp;id=cj2civacd00302rogivh6xbx2&amp;access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA"
+                target="_blank">Improve this map</a>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="map-overlay" id="features">
+      <h3>Process will be automated </h3>
+      <div id="pd">
+        <p>Hover over a building</p>
+      </div>
+    </div>
+    <div class="map-overlay" id="legend">
+<div id='map'></div>
+    </div><span class="legend-key" style="background-color: rgb(255, 237, 160);"></span>
+
+        <script>
+        
+          // define access token
+          mapboxgl.accessToken = 'pk.eyJ1IjoicGFjb3ZlbnRyeSIsImEiOiIzNTUyZmYwOTQyZTMyMWI1N2MwYzMzZmI5N2FhZDc0NCJ9.aICAZyWE3be2qyXy8Bny4w';
+
+          //create map
+          var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/pacoventry/cjed15cxc2m0o2snpphyfvrtv' // map style URL from Mapbox Studio
+       
+          });
+          // wait for map to load before adjusting it
+          map.on('load', function() {
+
+            map.addLayer({
+              'id': 'Miami_Beach_Sample_rev',
+              'type': 'fill',
+              'source': {
+                'type': 'vector',
+                'url': 'mapbox://pacoventry.cjed4dsi70rvk33o9nft73063-6ukx5'
+              },
+              'source-layer': 'Miami_Beach_Sample_rev',
+              'paint': {
+                'fill-color': 'rgba(72, 67, 45, 0)',
+                'fill-outline-color': 'rgba(0, 0, 0, 0)'
+              }
+            });
+
+
+            // make a pointer cursor
+            map.getCanvas().style.cursor = 'default';
+
+
+
+            // set map bounds to the continental US
+            map.fitBounds([
+              [-78.857716, 33.7113756],
+              [-98.857716, 53.7113756]
+            ]);
+
+            // make a pointer cursor
+            map.getCanvas().style.cursor = 'default';
+
+            // define layer names
+            var layers = [];
+            var colors = ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
+
+            // create legend
+            for (i = 0; i < layers.length; i++) {
+              var layer = layers[i];
+              var color = colors[i];
+              var item = document.createElement('div');
+              var key = document.createElement('span');
+              key.className = 'legend-key';
+              key.style.backgroundColor = color;
+
+              var value = document.createElement('span');
+              value.innerHTML = layer;
+              item.appendChild(key);
+              item.appendChild(value);
+              legend.appendChild(item);
+            }
+       
+            // change info window on hover
+            map.on('mousemove', function(e) {
+              var buildings = map.queryRenderedFeatures(e.point, {
+                layers: ['Miami_Beach_Sample_rev']
+              });
+
+              if (buildings.length > 0) {
+                document.getElementById('pd').innerHTML = 
+                "<p><strong><em>" + buildings[0].properties.TRUE_SIT_1 +
+                "<p><strong><em> building square feet = " + buildings[0].properties.area_calc + "</strong></em></p>";
+              } else {
+                document.getElementById('pd').innerHTML = '<p>Hover over a building</p>';
+              }
+            });
+          });
+
+        </script>
+<script>
+
+map.addControl(new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken
+}));
+</script>
+       
+        
+  </body>
+  </html>
